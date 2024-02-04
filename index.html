@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escrow Contract Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+        button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #saleDetails {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Escrow Contract Interface</h1>
+    <div>
+        <label for="saleId">Enter Sale ID:</label>
+        <input type="text" id="saleId">
+        <button onclick="getSaleDetails()">Get Sale Details</button>
+    </div>
+    <div id="saleDetails"></div>
+    <div>
+        <label for="depositAmount">Enter Deposit Amount:</label>
+        <input type="text" id="depositAmount">
+        <button onclick="deposit()">Deposit</button>
+    </div>
+
+    <script>
+        async function getSaleDetails() {
+            const saleId = document.getElementById("saleId").value;
+            try {
+                const contract = await getContractInstance();
+                const sale = await contract.methods.sales(saleId).call();
+                document.getElementById("saleDetails").innerHTML = `
+                    <h2>Sale Details</h2>
+                    <p>Seller: ${sale.seller}</p>
+                    <p>Buyer: ${sale.buyer}</p>
+                    <p>Third Party: ${sale.thirdParty}</p>
+                    <p>Amount: ${sale.amount}</p>
+                    <p>Fee: ${sale.fee}</p>
+                    <p>Funds Deposited: ${sale.fundsDeposited}</p>
+                    <p>Buyer Confirmed Receipt: ${sale.buyerConfirmedReceipt}</p>
+                    <p>Funds Released: ${sale.fundsReleased}</p>
+                    <p>Sale Finalized: ${sale.saleFinalized}</p>
+                    <p>End Time: ${new Date(sale.endTime * 1000)}</p>
+                    <p>Seller Address on Other Chain: ${sale.sellerAddressOnOtherChain}</p>
+                    <p>Chain Transacting On: ${sale.chainTransactingOn}</p>
+                    <p>Coin Amount Listing: ${sale.coinAmountListing}</p>
+                    <p>Transaction Hash: ${sale.transactionHash}</p>
+                `;
+            } catch (error) {
+                console.error("Error retrieving sale details:", error);
+            }
+        }
+
+        async function deposit() {
+            const saleId = document.getElementById("saleId").value;
+            const depositAmount = document.getElementById("depositAmount").value;
+            try {
+                const contract = await getContractInstance();
+                await contract.methods.deposit(saleId).send({ value: depositAmount });
+                alert("Deposit successful!");
+            } catch (error) {
+                console.error("Error depositing funds:", error);
+                alert("Error depositing funds. Please check the console for details.");
+            }
+        }
+
+        async function getContractInstance() {
+            try {
+                // Replace 'YourContractAddress' and 'YourContractABI' with actual contract address and ABI
+                const contractAddress = 'YourContractAddress';
+                const contractABI = YourContractABI;
+                const web3 = new Web3(window.ethereum);
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
+                return contract;
+            } catch (error) {
+                console.error("Error getting contract instance:", error);
+                throw error;
+            }
+        }
+
+        // Initialize MetaMask
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                } catch (error) {
+                    console.error("User denied account access:", error);
+                    alert("You need to allow access to your MetaMask account.");
+                }
+            } else {
+                console.error("No Ethereum provider found.");
+                alert("Please install MetaMask to use this application.");
+            }
+        });
+    </script>
+</body>
+</html>
