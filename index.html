@@ -43,13 +43,30 @@
 </head>
 <body>
     <h1>Escrow Contract Interface</h1>
-    <button onclick="connectToMetaMask()">Connect to MetaMask</button>
+    <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
+    <script>async function connectToMetaMask() {
+    if (window.ethereum) {
+        try {
+            // Request account access if needed
+            await window.ethereum.enable();
+            alert("Connected to MetaMask!");
+        } catch (error) {
+            console.error("User denied account access:", error);
+            alert("You need to allow access to your MetaMask account.");
+        }
+    } else {
+        console.error("No Ethereum provider found.");
+        alert("Please install MetaMask to use this application.");
+    }
+}
+</script>
+
     <div>
         <label for="sellerAddress">Address on other chain:</label>
         <input type="text" id="sellerAddress">
     </div>
     <div>
-        <label for="amount">Amount of BNB requested:</label>
+        <label for="amount">Amount of Bnb requested:</label>
         <input type="text" id="amount">
     </div>
     <div>
@@ -75,46 +92,68 @@
         <button onclick="deposit()">Deposit</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
     <script>
-        let web3;
+      async function createSale() {
+    const sellerAddress = document.getElementById("sellerAddress").value;
+    const amount = document.getElementById("amount").value;
+    const sellerChain = document.getElementById("sellerChain").value;
+    const coinAmount = document.getElementById("coinAmount").value;
 
-        async function connectToMetaMask() {
-            if (window.ethereum) {
-                try {
-                    await window.ethereum.send('eth_requestAccounts');
-                    web3 = new Web3(window.ethereum);
-                    console.log("Connected to MetaMask:", web3);
-                } catch (error) {
-                    console.error("MetaMask connection error:", error);
-                    alert("Error connecting to MetaMask. Please check the console for details.");
-                }
-            } else {
-                console.error("MetaMask not detected.");
-                alert("MetaMask is required to use this application.");
-            }
-        }
+    try {
+        const contract = await getContractInstance();
+        await contract.methods['createSale'](amount, sellerAddress, sellerChain, coinAmount)
+            .send({ from: window.ethereum.selectedAddress });
+        alert("Sale created successfully!");
+    } catch (error) {
+        console.error("Error creating sale:", error);
+        alert("Error creating sale. Please check the console for details.");
+    }
+}
 
-        async function createSale() {
-            const sellerAddress = document.getElementById("sellerAddress").value;
-            const amount = document.getElementById("amount").value;
-            const sellerChain = document.getElementById("sellerChain").value;
-            const coinAmount = document.getElementById("coinAmount").value;
-
+        async function getSaleDetails() {
+            const saleId = document.getElementById("saleId").value;
             try {
-                const accounts = await web3.eth.getAccounts();
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: accounts[0] });
-                alert("Sale created successfully!");
+                const contract = await getContractInstance();
+                const sale = await contract.methods.sales(saleId).call();
+                document.getElementById("saleDetails").innerHTML = `
+                    <h2>Sale Details</h2>
+                    <p>Seller: ${sale.seller}</p>
+                    <p>Buyer: ${sale.buyer}</p>
+                    <p>Third Party: ${sale.thirdParty}</p>
+                    <p>Amount: ${sale.amount}</p>
+                    <p>Fee: ${sale.fee}</p>
+                    <p>Funds Deposited: ${sale.fundsDeposited}</p>
+                    <p>Buyer Confirmed Receipt: ${sale.buyerConfirmedReceipt}</p>
+                    <p>Funds Released: ${sale.fundsReleased}</p>
+                    <p>Sale Finalized: ${sale.saleFinalized}</p>
+                    <p>End Time: ${new Date(sale.endTime * 1000)}</p>
+                    <p>Seller Address on Other Chain: ${sale.sellerAddressOnOtherChain}</p>
+                    <p>Chain Transacting On: ${sale.chainTransactingOn}</p>
+                    <p>Coin Amount Listing: ${sale.coinAmountListing}</p>
+                    <p>Transaction Hash: ${sale.transactionHash}</p>
+                `;
             } catch (error) {
-                console.error("Error creating sale:", error);
-                alert("Error creating sale. Please check the console for details.");
+                console.error("Error retrieving sale details:", error);
             }
         }
 
-        // Define contract ABI and address
+        async function deposit() {
+            const saleId = document.getElementById("saleId").value;
+            const depositAmount = document.getElementById("depositAmount").value;
+            try {
+                const contract = await getContractInstance();
+                await contract.methods.deposit(saleId).send({ value: depositAmount });
+                alert("Deposit successful!");
+            } catch (error) {
+                console.error("Error depositing funds:", error);
+                alert("Error depositing funds. Please check the console for details.");
+            }
+        }
+
+async function getContractInstance() {
+    try {
+        const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
         const contractABI = [
-[
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -418,10 +457,42 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]        ];
-        const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
+];
+        
+        // Initialize web3 with the Hypra chain RPC URL
+        const web3 = new Web3('https://rpc.hypra.network');
 
-        // Other functions (getSaleDetails, deposit) remain unchanged
+        // Set the provider to use MetaMask if available
+        if (window.ethereum) {
+            await window.ethereum.enable();
+            web3.eth.defaultAccount = window.ethereum.selectedAddress;
+        }
+
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        return contract;
+    } catch (error) {
+        console.error("Error getting contract instance:", error);
+        throw error;
+    }
+}
+
+
+        // Initialize MetaMask
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                } catch (error) {
+                    console.error("User denied account access:", error);
+                    alert("You need to allow access to your MetaMask account.");
+                }
+            } else {
+                console.error("No Ethereum provider found.");
+                alert("Please install MetaMask to use this application.");
+            }
+        });
     </script>
 </body>
 </html>
