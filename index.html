@@ -127,11 +127,18 @@ async function createSale() {
     const amount = document.getElementById("amount").value;
     const sellerChain = document.getElementById("sellerChain").value;
     const coinAmount = document.getElementById("coinAmount").value;
-    const selectedAddress = window.ethereum.selectedAddress;
-
-    console.log("Selected Ethereum Address:", selectedAddress); // Add this line
 
     try {
+        if (!window.ethereum) {
+            alert("MetaMask is not detected. Please install MetaMask to use this application.");
+            return;
+        }
+
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const selectedAddress = accounts[0];
+
+        console.log("Selected Ethereum Address:", selectedAddress);
+
         if (!selectedAddress) {
             alert("No Ethereum account is currently selected. Please connect to MetaMask.");
             return;
@@ -147,6 +154,7 @@ async function createSale() {
         alert("Error creating sale. Please check the console for details.");
     }
 }
+
 
 
 
