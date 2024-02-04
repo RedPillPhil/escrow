@@ -61,6 +61,34 @@
     }
 }
 </script>
+    <h1>Connected Ethereum Address:</h1>
+    <p id="ethereumAddress">Loading...</p>
+
+    <script>
+        // Function to display the connected Ethereum address
+        async function displayConnectedAddress() {
+            if (window.ethereum) {
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                    // Get the selected address
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    const selectedAddress = accounts[0]; // Get the first account
+                    // Update the HTML element with the address
+                    document.getElementById('ethereumAddress').textContent = selectedAddress;
+                } catch (error) {
+                    console.error("Error retrieving connected address:", error);
+                    document.getElementById('ethereumAddress').textContent = "Error: " + error.message;
+                }
+            } else {
+                console.error("No Ethereum provider found.");
+                document.getElementById('ethereumAddress').textContent = "MetaMask not detected.";
+            }
+        }
+
+        // Call the function when the page loads
+        window.addEventListener('load', displayConnectedAddress);
+    </script>
 
     <div>
         <label for="sellerAddress">Address on other chain:</label>
