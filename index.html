@@ -106,40 +106,41 @@
             }
         }
 
-        async function createSale() {
-            // Fetch input values
-            const sellerAddress = document.getElementById("sellerAddress").value.trim();
-            const amount = document.getElementById("amount").value.trim();
-            const sellerChain = document.getElementById("sellerChain").value.trim();
-            const coinAmount = document.getElementById("coinAmount").value.trim();
+       async function createSale() {
+    try {
+        // Fetch input values
+        const sellerAddress = document.getElementById("sellerAddress").value.trim();
+        const amount = document.getElementById("amount").value.trim();
+        const sellerChain = document.getElementById("sellerChain").value.trim();
+        const coinAmount = document.getElementById("coinAmount").value.trim();
 
-            // Validate inputs
-            if (!sellerAddress || !amount || !sellerChain || !coinAmount) {
-                alert("Please fill in all the fields.");
-                return;
-            }
-
-            // Validate amount input (must be a positive number)
-            if (isNaN(amount) || parseFloat(amount) <= 0) {
-                alert("Please enter a valid amount (a positive number) for BNB requested.");
-                return;
-            }
-
-            // Construct the contract instance
-            try {
-                const contract = await getContractInstance();
-
-                // Send transaction to create sale
-                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount)
-                    .send({ from: window.ethereum.selectedAddress });
-
-                // Show success message
-                alert("Sale created successfully!");
-            } catch (error) {
-                console.error("Error creating sale:", error);
-                alert("Error creating sale. Please check the console for details.");
-            }
+        // Validate inputs
+        if (!sellerAddress || !amount || !sellerChain || !coinAmount) {
+            alert("Please fill in all the fields.");
+            return;
         }
+
+        // Validate amount input (must be a positive number)
+        if (isNaN(amount) || parseFloat(amount) <= 0) {
+            alert("Please enter a valid amount (a positive number) for BNB requested.");
+            return;
+        }
+
+        // Construct the contract instance
+        const contract = await getContractInstance();
+
+        // Send transaction to create sale
+        await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount)
+            .send({ from: window.ethereum.selectedAddress });
+
+        // Show success message
+        alert("Sale created successfully!");
+    } catch (error) {
+        console.error("Error creating sale:", error);
+        alert("Error creating sale. Please check the console for details.");
+    }
+}
+
 
         // Function to get contract instance
         async function getContractInstance() {
