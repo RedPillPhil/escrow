@@ -43,24 +43,6 @@
 </head>
 <body>
     <h1>Escrow Contract Interface</h1>
-    <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
-    <script>async function connectToMetaMask() {
-    if (window.ethereum) {
-        try {
-            // Request account access if needed
-            await window.ethereum.enable();
-            alert("Connected to MetaMask!");
-        } catch (error) {
-            console.error("User denied account access:", error);
-            alert("You need to allow access to your MetaMask account.");
-        }
-    } else {
-        console.error("No Ethereum provider found.");
-        alert("Please install MetaMask to use this application.");
-    }
-}
-</script>
-
     <div>
         <label for="sellerAddress">Address on other chain:</label>
         <input type="text" id="sellerAddress">
