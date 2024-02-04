@@ -44,22 +44,6 @@
 <body>
     <h1>Escrow Contract Interface</h1>
     <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
-    <script>async function connectToMetaMask() {
-    if (window.ethereum) {
-        try {
-            // Request account access if needed
-            await window.ethereum.enable();
-            alert("Connected to MetaMask!");
-        } catch (error) {
-            console.error("User denied account access:", error);
-            alert("You need to allow access to your MetaMask account.");
-        }
-    } else {
-        console.error("No Ethereum provider found.");
-        alert("Please install MetaMask to use this application.");
-    }
-}
-</script>
 
     <div>
         <label for="sellerAddress">Address on other chain:</label>
@@ -93,38 +77,21 @@
     </div>
 
     <script>
- async function createSale() {
-    const sellerAddress = document.getElementById("sellerAddress").value;
-    const amount = document.getElementById("amount").value;
-    const sellerChain = document.getElementById("sellerChain").value;
-    const coinAmount = document.getElementById("coinAmount").value;
+        async function createSale() {
+            const sellerAddress = document.getElementById("sellerAddress").value;
+            const amount = document.getElementById("amount").value;
+            const sellerChain = document.getElementById("sellerChain").value;
+            const coinAmount = document.getElementById("coinAmount").value;
 
-    try {
-        const contract = await getContractInstance();
-
-        // Get the contract address
-        const contractAddress = contract.options.address;
-
-        // Create the transaction object
-        const txObject = {
-            from: window.ethereum.selectedAddress,
-            to: contractAddress,
-            value: web3.utils.toWei(amount, 'ether'), // Convert amount to Wei if needed
-            gas: 200000 // Adjust gas limit as needed
-        };
-
-        // Send the transaction
-        await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject]
-        });
-
-        alert("Sale created successfully!");
-    } catch (error) {
-        console.error("Error creating sale:", error);
-        alert("Error creating sale. Please check the console for details.");
-    }
-}
+            try {
+                const contract = await getContractInstance();
+                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress });
+                alert("Sale created successfully!");
+            } catch (error) {
+                console.error("Error creating sale:", error);
+                alert("Error creating sale. Please check the console for details.");
+            }
+        }
 
         async function getSaleDetails() {
             const saleId = document.getElementById("saleId").value;
