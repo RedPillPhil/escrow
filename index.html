@@ -43,14 +43,12 @@
 </head>
 <body>
     <h1>Escrow Contract Interface</h1>
-    <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
-
     <div>
         <label for="sellerAddress">Address on other chain:</label>
         <input type="text" id="sellerAddress">
     </div>
     <div>
-        <label for="amount">Amount of BNB requested:</label>
+        <label for="amount">Amount of Bnb requested:</label>
         <input type="text" id="amount">
     </div>
     <div>
@@ -76,24 +74,7 @@
         <button onclick="deposit()">Deposit</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
     <script>
-        async function connectToMetaMask() {
-            if (window.ethereum) {
-                try {
-                    // Request account access if needed
-                    await window.ethereum.enable();
-                    alert("Connected to MetaMask!");
-                } catch (error) {
-                    console.error("User denied account access:", error);
-                    alert("You need to allow access to your MetaMask account.");
-                }
-            } else {
-                console.error("No Ethereum provider found.");
-                alert("Please install MetaMask to use this application.");
-            }
-        }
-
         async function createSale() {
             const sellerAddress = document.getElementById("sellerAddress").value;
             const amount = document.getElementById("amount").value;
@@ -102,7 +83,7 @@
 
             try {
                 const contract = await getContractInstance();
-                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress, value: 0 });
+                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress });
                 alert("Sale created successfully!");
             } catch (error) {
                 console.error("Error creating sale:", error);
@@ -150,10 +131,10 @@
             }
         }
 
-        async function getContractInstance() {
-            try {
-                const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
-                const contractABI = [ [
+async function getContractInstance() {
+    try {
+        const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
+        const contractABI = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -457,26 +438,32 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-] ];
-                const web3 = new Web3('https://rpc.hypra.network');
+];
+        
+        // Initialize web3 with the Hypra chain RPC URL
+        const web3 = new Web3('https://rpc.hypra.network');
 
-                if (window.ethereum) {
-                    await window.ethereum.enable();
-                    web3.eth.defaultAccount = window.ethereum.selectedAddress;
-                }
-
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-                return contract;
-            } catch (error) {
-                console.error("Error getting contract instance:", error);
-                throw error;
-            }
+        // Set the provider to use MetaMask if available
+        if (window.ethereum) {
+            await window.ethereum.enable();
+            web3.eth.defaultAccount = window.ethereum.selectedAddress;
         }
 
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        return contract;
+    } catch (error) {
+        console.error("Error getting contract instance:", error);
+        throw error;
+    }
+}
+
+
+        // Initialize MetaMask
         window.addEventListener('load', async () => {
             if (window.ethereum) {
                 window.web3 = new Web3(window.ethereum);
                 try {
+                    // Request account access if needed
                     await window.ethereum.enable();
                 } catch (error) {
                     console.error("User denied account access:", error);
