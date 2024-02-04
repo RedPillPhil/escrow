@@ -129,6 +129,8 @@ async function createSale() {
     const coinAmount = document.getElementById("coinAmount").value;
     const selectedAddress = window.ethereum.selectedAddress;
 
+    console.log("Selected Ethereum Address:", selectedAddress); // Add this line
+
     try {
         if (!selectedAddress) {
             alert("No Ethereum account is currently selected. Please connect to MetaMask.");
@@ -145,6 +147,7 @@ async function createSale() {
         alert("Error creating sale. Please check the console for details.");
     }
 }
+
 
 
 
