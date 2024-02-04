@@ -43,8 +43,6 @@
 </head>
 <body>
     <h1>Escrow Contract Interface</h1>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-
     <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
     <script>async function connectToMetaMask() {
     if (window.ethereum) {
@@ -103,30 +101,14 @@
 
     try {
         const contract = await getContractInstance();
-
-        // Get the contract address
-        const contractAddress = contract.options.address;
-
-        // Create the transaction object
-        const txObject = {
-            from: window.ethereum.selectedAddress,
-            to: contractAddress,
-            value: web3.utils.toWei(amount, 'ether'), // Convert amount to Wei if needed
-            gas: 200000 // Adjust gas limit as needed
-        };
-
-        // Send the transaction
-        await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject]
-        });
-
+        await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress, value: 0 });
         alert("Sale created successfully!");
     } catch (error) {
         console.error("Error creating sale:", error);
         alert("Error creating sale. Please check the console for details.");
     }
 }
+
 
         async function getSaleDetails() {
             const saleId = document.getElementById("saleId").value;
