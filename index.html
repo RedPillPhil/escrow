@@ -102,7 +102,7 @@
 
             try {
                 const contract = await getContractInstance();
-                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress, value: 0 });
+                await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: accounts[0] });
                 alert("Sale created successfully!");
             } catch (error) {
                 console.error("Error creating sale:", error);
