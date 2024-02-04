@@ -43,6 +43,8 @@
 </head>
 <body>
     <h1>Escrow Contract Interface</h1>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+
     <button id="connectButton" onclick="connectToMetaMask()">Connect to MetaMask</button>
     <script>async function connectToMetaMask() {
     if (window.ethereum) {
@@ -101,7 +103,7 @@
 
     try {
         const contract = await getContractInstance();
-        await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress, value: 0 });
+       await contract.methods.createSale(amount, sellerAddress, sellerChain, coinAmount).send({ from: window.ethereum.selectedAddress });
         alert("Sale created successfully!");
     } catch (error) {
         console.error("Error creating sale:", error);
