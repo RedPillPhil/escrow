@@ -131,11 +131,10 @@
             }
         }
 
-        async function getContractInstance() {
-            try {
-                // Replace 'YourContractAddress' and 'YourContractABI' with actual contract address and ABI
-                const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
-                const contractABI = [
+async function getContractInstance() {
+    try {
+        const contractAddress = '0x7827e6325245C90908F8140F9150C78E0C360889';
+        const contractABI = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -152,100 +151,6 @@
 			}
 		],
 		"name": "BuyerConfirmedReceipt",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "saleId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "buyer",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "FundsDeposited",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "saleId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "seller",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "SaleCreated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "saleId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "seller",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "SaleFinalized",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "saleId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "transactionHash",
-				"type": "string"
-			}
-		],
-		"name": "TransactionHashPosted",
 		"type": "event"
 	},
 	{
@@ -322,17 +227,29 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "latestSaleId",
-		"outputs": [
+		"anonymous": false,
+		"inputs": [
 			{
+				"indexed": false,
 				"internalType": "uint256",
-				"name": "",
+				"name": "saleId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
+		"name": "FundsDeposited",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -350,6 +267,88 @@
 		"name": "postTransactionHash",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "saleId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "SaleCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "saleId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "SaleFinalized",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "saleId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "transactionHash",
+				"type": "string"
+			}
+		],
+		"name": "TransactionHashPosted",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "latestSaleId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -440,14 +439,24 @@
 		"type": "function"
 	}
 ];
-                const web3 = new Web3(window.ethereum);
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-                return contract;
-            } catch (error) {
-                console.error("Error getting contract instance:", error);
-                throw error;
-            }
+        
+        // Initialize web3 with the Hypra chain RPC URL
+        const web3 = new Web3('https://rpc.hypra.network');
+
+        // Set the provider to use MetaMask if available
+        if (window.ethereum) {
+            await window.ethereum.enable();
+            web3.eth.defaultAccount = window.ethereum.selectedAddress;
         }
+
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        return contract;
+    } catch (error) {
+        console.error("Error getting contract instance:", error);
+        throw error;
+    }
+}
+
 
         // Initialize MetaMask
         window.addEventListener('load', async () => {
